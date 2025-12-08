@@ -11,6 +11,6 @@ include 'section_makeup.php';
 include 'lipstick.php';
 include 'skincare.php';
 include 'body_care.php';
-
-// include 'footer.php';
+include 'perfume.php';
+include 'footer.php';
 ?>

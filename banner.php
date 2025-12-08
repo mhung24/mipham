@@ -1,5 +1,4 @@
 <?php
-// Dữ liệu mẫu cho Sidebar Danh mục Sản phẩm
 $sidebar_items = [
     ['text' => 'Trang Điểm', 'link' => '#trangdiem'],
     ['text' => 'Mascara', 'link' => '#mascara'],
@@ -62,14 +61,9 @@ $sidebar_items = [
     </div>
 </div>
 <style>
-    /* CSS TÙY CHỈNH CHO MAIN CONTENT (SIDEBAR & BANNER) */
-
-    /* 1. Sidebar Styling */
     .sidebar-menu {
         border: 1px solid #e0e0e0;
-        /* Viền xám nhạt */
         height: 100%;
-        /* Đảm bảo chiều cao bằng với Banner lớn */
         overflow: hidden;
     }
 
@@ -78,30 +72,24 @@ $sidebar_items = [
         border-right: none !important;
         border-radius: 0 !important;
         padding: 10px 15px;
-        /* Khoảng cách item thoáng hơn */
         font-size: 14.5px;
-        /* Kích thước chữ vừa phải */
     }
 
-    /* Hiệu ứng hover cho sidebar item */
     .sidebar-menu .list-group-item:hover {
         background-color: #f5f5f5;
         cursor: pointer;
     }
 
-    /* Link trong sidebar */
     .sidebar-link {
         color: #333 !important;
     }
 
-    /* 2. Banner Styling */
     .main-banner-img,
     .sub-banner-img {
         width: 100%;
         border-radius: 0 !important;
     }
 
-    /* Cân đối chiều cao Banner Phụ */
     .col-lg-4>.d-flex {
         height: 100%;
     }
@@ -110,12 +98,10 @@ $sidebar_items = [
         object-fit: cover;
     }
 
-    /* Khoảng cách giữa hai banner phụ */
     .col-lg-4 .mb-3 {
         margin-bottom: 12px !important;
     }
 
-    /* Điều chỉnh banner phụ cuối cùng để không có margin bottom */
     .col-lg-4 .d-flex a:last-child {
         margin-bottom: 0 !important;
     }

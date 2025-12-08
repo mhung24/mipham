@@ -1,0 +1,119 @@
+/* --- TỔNG QUAN FOOTER --- */
+.coco-footer {
+  background-color: #000000;
+  color: #ffffff;
+  font-size: 13px;
+  padding-top: 50px;
+  padding-bottom: 30px;
+  font-family: Arial, Helvetica, sans-serif;
+  border-top: 3px solid #d0021b; /* Viền đỏ trên cùng */
+}
+
+/* Tiêu đề cột */
+.coco-footer h4 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  color: #fff;
+  margin-top: 0;
+}
+
+/* --- LINK & TEXT --- */
+.coco-footer a {
+  color: #cccccc;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
+  transition: 0.3s;
+}
+
+.coco-footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.coco-footer p {
+  color: #cccccc;
+  line-height: 1.6;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
+/* --- LOGO --- */
+.footer-logo {
+  max-width: 180px;
+  margin-bottom: 20px;
+  display: block;
+  background: #fff; /* Nền trắng cho logo nếu logo là file png trong suốt */
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* --- ICON MẠNG XÃ HỘI & THANH TOÁN (Style giống mẫu) --- */
+.social-btn,
+.payment-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: #ffffff; /* Nền trắng */
+  color: #000000; /* Icon màu đen */
+  border-radius: 4px; /* Bo góc nhẹ */
+  margin-right: 8px;
+  margin-bottom: 8px;
+  text-decoration: none !important; /* Bỏ gạch chân */
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+/* Hover vào icon MXH thì chuyển màu đỏ */
+.social-btn:hover {
+  background-color: #d0021b;
+  color: #ffffff;
+}
+
+/* Icon thanh toán thì ko cần hover */
+.payment-btn {
+  cursor: default;
+}
+
+/* --- FORM ĐĂNG KÝ --- */
+.footer-newsletter-input {
+  border-radius: 4px 0 0 4px !important;
+  border: 1px solid #fff;
+  height: 38px;
+  font-size: 13px;
+  padding-left: 15px;
+}
+
+.footer-newsletter-btn {
+  border-radius: 0 4px 4px 0 !important;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #fff;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  height: 38px;
+  padding: 0 15px;
+  transition: 0.3s;
+}
+
+.footer-newsletter-btn:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.footer-divider {
+  border-top: 1px solid #333;
+  margin: 30px 0;
+}
+
+.text-white {
+  color: #fff !important;
+}
+.fw-bold {
+  font-weight: 700 !important;
+}

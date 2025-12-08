@@ -1,14 +1,26 @@
 <?php
-// 1. TỰ ĐỘNG TÌM ID CỦA DANH MỤC "Chăm Sóc Cơ Thể"
-$stmt_get_id_where = $pdo->prepare("SELECT name FROM banners WHERE id = 4");
-$stmt_get_id = $pdo->prepare("SELECT id FROM categories WHERE name = $stmt_get_id_where LIMIT 1");
-$stmt_get_id->execute();
-$row_cat = $stmt_get_id->fetch(PDO::FETCH_ASSOC);
 
-// Lấy ID (nếu không thấy thì mặc định 0)
-$cat_id_body = $row_cat ? $row_cat['id'] : 0;
+$stmt_banner = $pdo->prepare("SELECT name, image FROM banners WHERE id = 4 LIMIT 1");
+$stmt_banner->execute();
+$banner_data = $stmt_banner->fetch(PDO::FETCH_ASSOC);
 
-// 2. LẤY SẢN PHẨM (Thuộc Chăm Sóc Cơ Thể hoặc con của nó)
+if ($banner_data) {
+    $target_name = $banner_data['name'];
+    $current_banner = $banner_data['image'];
+} else {
+
+    $target_name = 'Chăm Sóc Cơ Thể';
+    $current_banner = './img/banner_bodycare.jpg';
+}
+
+$stmt_get_id = $pdo->prepare("SELECT id FROM categories WHERE name = :name LIMIT 1");
+$stmt_get_id->execute([':name' => $target_name]);
+$cat_id_body = $stmt_get_id->fetchColumn();
+
+if (!$cat_id_body) {
+    $cat_id_body = 0;
+}
+
 $sql = "SELECT p.*, 
                (SELECT image_url FROM product_gallery WHERE product_id = p.id LIMIT 1) as thumbnail 
         FROM products p 
@@ -24,7 +36,7 @@ try {
     $body_products = [];
 }
 
-// 3. LẤY MENU CON (Sữa tắm, Dưỡng thể...)
+// --- BƯỚC 4: LẤY MENU CON ---
 $sql_sub = "SELECT * FROM categories WHERE parent_id = $cat_id_body ORDER BY sort_order ASC LIMIT 5";
 try {
     $stmt_sub = $pdo->prepare($sql_sub);
@@ -60,7 +72,9 @@ try {
 
             <a class="makeup-tab-active-lipstick" href="list_products.php?cat_id=<?= $cat_id_body ?>"
                 style="background: #222; color: #fff; padding: 15px 30px; display: block; text-decoration: none; position: relative;">
-                <h2 class="text-uppercase mb-0" style="color: #fff; font-size: 18px; margin: 0;">CHĂM SÓC CƠ THỂ</h2>
+                <h2 class="text-uppercase mb-0" style="color: #fff; font-size: 16px; margin: 0;">
+                    <?= htmlspecialchars($target_name) ?>
+                </h2>
             </a>
         </div>
     </div>
@@ -108,7 +122,8 @@ try {
         </div>
 
         <div class="col-lg-2 col-md-3 d-none d-md-block makeup-banner-col">
-            <img src="<?= htmlspecialchars($current_banner) ?>" class="makeup-banner-img" alt="Banner Chăm Sóc Cơ Thể"
+            <img src="<?= htmlspecialchars($current_banner) ?>" class="makeup-banner-img"
+                alt="Banner <?= htmlspecialchars($target_name) ?>"
                 style="width: 100%; height: 100%; object-fit: cover;">
         </div>
 
