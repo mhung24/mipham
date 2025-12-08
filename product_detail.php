@@ -1,0 +1,352 @@
+<?php
+require_once 'config/connect.php';
+
+$product_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+
+if ($product_id == 0)
+    die("Sản phẩm không tồn tại.");
+
+$sql = "SELECT p.*, b.name as brand_name 
+        FROM products p 
+        LEFT JOIN brands b ON p.brand_id = b.id 
+        WHERE p.id = :id";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([':id' => $product_id]);
+$product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$product)
+    die("Không tìm thấy sản phẩm.");
+
+$stmt_gallery = $pdo->prepare("SELECT image_url FROM product_gallery WHERE product_id = :id");
+$stmt_gallery->execute([':id' => $product_id]);
+$gallery = $stmt_gallery->fetchAll(PDO::FETCH_COLUMN);
+
+if (empty($gallery))
+    $gallery[] = 'img/no-image.png';
+
+$stmt_specs = $pdo->prepare("SELECT * FROM product_specifications WHERE product_id = :id");
+$stmt_specs->execute([':id' => $product_id]);
+$specs = $stmt_specs->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt_blocks = $pdo->prepare("SELECT * FROM product_content_blocks WHERE product_id = :id ORDER BY id ASC");
+$stmt_blocks->execute([':id' => $product_id]);
+$all_blocks = $stmt_blocks->fetchAll(PDO::FETCH_ASSOC);
+
+$blocks_use = [];
+$blocks_usage = [];
+$blocks_review = [];
+$blocks_feedback = [];
+
+foreach ($all_blocks as $block) {
+    if ($block['section_type'] == 'use')
+        $blocks_use[] = $block;
+    if ($block['section_type'] == 'usage')
+        $blocks_usage[] = $block;
+    if ($block['section_type'] == 'review')
+        $blocks_review[] = $block;
+    if ($block['section_type'] == 'feedback')
+        $blocks_feedback[] = $block;
+}
+
+$stmt_vouchers = $pdo->prepare("SELECT * FROM vouchers WHERE is_active = 1 AND end_date >= CURDATE() ORDER BY discount_amount DESC");
+$stmt_vouchers->execute();
+$vouchers = $stmt_vouchers->fetchAll(PDO::FETCH_ASSOC);
+
+$price = $product['price'];
+$old_price = $product['old_price'];
+$discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) * 100) : 0;
+?>
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($product['name']) ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/product_detail.css">
+    <link rel="stylesheet" href="./css/menu.css">
+</head>
+
+<body>
+    <?php include 'header.php'; ?>
+    <?php include 'menu.php'; ?>
+
+    <div class="container container-main">
+
+        <div class="row">
+            <div class="col-lg-4 col-md-5">
+                <div class="main-image-container">
+                    <img id="mainImage" src="<?= htmlspecialchars($gallery[0]) ?>" alt="Ảnh chính">
+                </div>
+                <div class="thumb-list">
+                    <?php foreach ($gallery as $index => $img): ?>
+                        <div class="thumb-item <?= $index == 0 ? 'active' : '' ?>"
+                            onclick="changeImage(this, '<?= htmlspecialchars($img) ?>')">
+                            <img src="<?= htmlspecialchars($img) ?>" alt="Thumb">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <div class="col-lg-5 col-md-7">
+                <div class="product-brand"><?= htmlspecialchars($product['brand_name'] ?? 'No Brand') ?></div>
+                <h1 class="product-title"><?= htmlspecialchars($product['name']) ?></h1>
+
+                <div class="product-meta">
+                    <span>Mã SKU: <strong><?= htmlspecialchars($product['sku']) ?></strong></span>
+                    <span class="mx-2">|</span>
+                    <span>Tình trạng: <span
+                            class="text-success fw-bold"><?= $product['stock_quantity'] > 0 ? 'Còn hàng' : 'Hết hàng' ?></span></span>
+                </div>
+
+                <div class="price-box">
+                    <span class="current-price"><?= number_format($price, 0, ',', '.') ?>đ</span>
+                    <?php if ($discount > 0): ?>
+                        <span class="old-price"><?= number_format($old_price, 0, ',', '.') ?>đ</span>
+                        <span class="discount-tag">-<?= $discount ?>%</span>
+                    <?php endif; ?>
+                </div>
+
+                <div class="alert alert-success py-2 px-3 mb-4" style="font-size: 13px; border: 1px dashed #198754;">
+                    <i class="bi bi-gift-fill me-2"></i> <strong>Ưu đãi:</strong> Miễn phí vận chuyển cho đơn hàng từ
+                    299k.
+                </div>
+
+                <div class="quantity-wrapper">
+                    <span class="qty-label">Số lượng:</span>
+                    <div class="qty-input-group">
+                        <button class="qty-btn" onclick="updateQty(-1)">-</button>
+                        <input type="number" id="qty" class="qty-input" value="1" min="1" readonly>
+                        <button class="qty-btn" onclick="updateQty(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="btn-buy-group">
+                    <button class="btn-add-cart" onclick="addToCart(this)" data-id="<?= $product['id'] ?>"
+                        data-name="<?= htmlspecialchars($product['name']) ?>" data-price="<?= $product['price'] ?>"
+                        data-img="<?= htmlspecialchars($gallery[0]) ?>">
+                        <i class="bi bi-bag-plus"></i> THÊM VÀO GIỎ
+                    </button>
+                    <button class="btn-buy-now">MUA NGAY</button>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-12 coupon-sidebar">
+                <div class="coupon-title">Mã khuyến mại</div>
+                <?php if (count($vouchers) > 0): ?>
+                    <?php foreach ($vouchers as $v): ?>
+                        <?php
+                        $percent_used = ($v['quantity'] > 0) ? ($v['used_count'] / $v['quantity']) * 100 : 0;
+                        ?>
+                        <div class="coupon-item">
+                            <div class="coupon-amount"><?= htmlspecialchars($v['discount_text']) ?></div>
+                            <div class="coupon-desc"><?= htmlspecialchars($v['condition_text']) ?></div>
+                            <div class="progress-mini">
+                                <div class="progress-bar-red" style="width: <?= $percent_used ?>%;"></div>
+                            </div>
+                            <div class="coupon-footer">
+                                <span style="font-size:12px; color:#999;">Đã dùng <?= $percent_used ?>%</span>
+                                <button class="btn-copy" onclick="copyCode(this, '<?= $v['code'] ?>')">Sao chép</button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="font-size:13px; color:#888;">Không có mã giảm giá nào.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="product-nav">
+                <a href="#info" class="active">Thông tin</a>
+                <a href="#uses">Công dụng</a>
+                <a href="#usage">Cách dùng</a>
+                <a href="#review">Review</a>
+                <a href="#feedback">Đánh giá (<?= count($blocks_feedback) ?>)</a>
+            </div>
+
+            <div id="info" class="scroll-target">
+                <h3 class="section-heading">Thông số & Thành phần</h3>
+
+                <?php if (!empty($specs)): ?>
+                    <table class="specs-table">
+                        <?php foreach ($specs as $s): ?>
+                            <tr>
+                                <td class="label"><?= htmlspecialchars($s['spec_name']) ?></td>
+                                <td><?= htmlspecialchars($s['spec_value']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                <?php endif; ?>
+
+                <div class="ingredients-box">
+                    <strong style="display:block; margin-bottom:10px;">Thành phần chi tiết:</strong>
+                    <?= nl2br(htmlspecialchars($product['ingredients'] ?? 'Đang cập nhật...')) ?>
+                </div>
+            </div>
+
+            <div id="uses" class="scroll-target">
+                <h3 class="section-heading">Công dụng</h3>
+                <?php foreach ($blocks_use as $block): ?>
+                    <div class="detail-block">
+                        <div class="detail-text"><?= nl2br(htmlspecialchars($block['content_text'])) ?></div>
+                        <?php if ($block['image_url']): ?>
+                            <img src="<?= htmlspecialchars($block['image_url']) ?>" alt="Công dụng">
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div id="usage" class="scroll-target">
+                <h3 class="section-heading">Hướng dẫn sử dụng</h3>
+                <?php foreach ($blocks_usage as $block): ?>
+                    <div class="detail-block">
+                        <div class="detail-text"><?= nl2br(htmlspecialchars($block['content_text'])) ?></div>
+                        <?php if ($block['image_url']): ?>
+                            <img src="<?= htmlspecialchars($block['image_url']) ?>" alt="Cách dùng">
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div id="review" class="scroll-target">
+                <h3 class="section-heading">Review Sản phẩm</h3>
+                <?php foreach ($blocks_review as $block): ?>
+                    <div class="detail-block">
+                        <?php if ($block['image_url']): ?>
+                            <img src="<?= htmlspecialchars($block['image_url']) ?>" alt="Marketing Review">
+                        <?php endif; ?>
+                        <div class="detail-text"><?= nl2br(htmlspecialchars($block['content_text'])) ?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div id="feedback" class="scroll-target">
+                <h3 class="section-heading">Đánh giá từ khách hàng</h3>
+                <div class="feedback-container">
+                    <?php foreach ($blocks_feedback as $block): ?>
+                        <div class="review-card">
+                            <div class="review-header">
+                                <div class="review-avatar">K</div>
+                                <div>
+                                    <div style="font-weight:bold; font-size:14px;">Khách hàng</div>
+                                    <div class="review-star">★★★★★</div>
+                                </div>
+                            </div>
+                            <div style="font-size:14px; color:#555; margin-bottom:10px;">
+                                "<?= nl2br(htmlspecialchars($block['content_text'])) ?>"
+                            </div>
+                            <?php if ($block['image_url']): ?>
+                                <img src="<?= htmlspecialchars($block['image_url']) ?>" class="review-img">
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        window.addToCart = function (btn) {
+            let quantityInput = parseInt(document.getElementById("qty").value);
+            if (isNaN(quantityInput) || quantityInput < 1) quantityInput = 1;
+
+            const product = {
+                id: btn.dataset.id,
+                name: btn.dataset.name,
+                price: parseInt(btn.dataset.price),
+                image: btn.dataset.img,
+                qty: quantityInput,
+            };
+
+            let cart = localStorage.getItem("my_cart");
+            try {
+                cart = cart ? JSON.parse(cart) : [];
+            } catch (e) {
+                cart = [];
+            }
+
+            let existingItem = cart.find((item) => item.id === product.id);
+
+            if (existingItem) {
+                existingItem.qty += product.qty;
+            } else {
+                cart.push(product);
+            }
+
+            localStorage.setItem("my_cart", JSON.stringify(cart));
+
+            if (typeof renderMiniCart === "function") {
+                renderMiniCart();
+            }
+
+            showToast(`Đã thêm <b>${product.name}</b> vào giỏ!`, 'success');
+        };
+        function updateQty(change) {
+            const input = document.getElementById("qty");
+
+            let currentVal = parseInt(input.value) || 1;
+            let newVal = currentVal + change;
+
+            if (newVal < 1) newVal = 1;
+            input.value = newVal;
+        }
+
+        function changeImage(element, src) {
+            const mainImage = document.getElementById("mainImage");
+            if (mainImage) mainImage.src = src;
+
+            document
+                .querySelectorAll(".thumb-item")
+                .forEach((el) => el.classList.remove("active"));
+            element.classList.add("active");
+        }
+
+        function copyCode(btn, code) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(code).then(() => {
+                    let originalText = btn.innerText;
+                    btn.innerText = "Đã chép";
+                    btn.style.background = "#2ecc71";
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.style.background = "#222";
+                    }, 2000);
+                });
+            } else {
+                alert("Mã voucher: " + code);
+            }
+        }
+
+        const sections = document.querySelectorAll(".scroll-target");
+        const navLinks = document.querySelectorAll(".product-nav a");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+
+                if (scrollY >= sectionTop - 180) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach((link) => {
+                link.classList.remove("active");
+
+                if (current && link.getAttribute("href").includes(current)) {
+                    link.classList.add("active");
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+.input-group > .btn,
+.input-group > .form-control {
+  z-index: 1;
+  border-radius: 0 !important;
+}
+
+.input-group .form-control {
+  border-right: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.input-group .btn {
+  border-left: none !important;
+}
+
+.quantity_cart {
+  top: 10px !important;
+  left: 44px !important;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border: 1px solid #ced4da;
+}
+
+.dropdown-hover-only .dropdown-menu {
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+  margin-top: 0;
+}
+
+.dropdown-hover-only:hover .dropdown-menu {
+  visibility: visible;
+  opacity: 1;
+
+  margin-top: 0;
+}
+
+.dropdown-hover-only .dropdown-item {
+  font-size: 0.95rem;
+}
+
+.dropdown-hover-only .dropdown-menu {
+  background-color: white;
+  border-radius: 0;
+}
+
+.dropdown-hover-only .dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: black;
+}
+
+.dropdown-hover-only .dropdown-toggle::after {
+  display: none;
+}
