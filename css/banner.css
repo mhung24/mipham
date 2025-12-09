@@ -1,0 +1,51 @@
+/* 1. KHUNG BAO NGOÀI (SIDEBAR) */
+.sidebar-menu {
+  position: relative; /* Điểm neo tọa độ CHÍNH */
+  z-index: 900;
+  background: #fff;
+  overflow: visible !important;
+}
+
+/* 2. ITEM MENU CẤP 1 (CHA - C1) */
+.menu-item-c1 {
+  /* QUAN TRỌNG: Đổi thành static để menu con không bám theo thằng này nữa */
+  position: static !important;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  padding: 12px 15px;
+}
+
+/* Hiệu ứng hover C1 */
+.menu-item-c1:hover {
+  background-color: #f8f9fa;
+  border-left-color: #d0021b;
+}
+
+/* 3. BẢNG MEGA MENU */
+.mega-menu {
+  display: none;
+  position: absolute;
+
+  /* VỊ TRÍ: Sát đỉnh của Sidebar (Top 0) và Sát bên phải (Left 100%) */
+  left: 100%;
+  top: 0;
+
+  /* KÍCH THƯỚC: Luôn cao bằng chiều cao của Sidebar */
+  height: 100%;
+  width: 650px;
+
+  background: #fff;
+  border: 1px solid #eee;
+  border-left: 1px solid #ddd;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 1000;
+  overflow-y: auto; /* Cho phép cuộn nếu nội dung dài quá */
+}
+
+/* Logic hiển thị */
+.menu-item-c1:hover .mega-menu {
+  display: block;
+}

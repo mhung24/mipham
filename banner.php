@@ -1,34 +1,76 @@
 <?php
-$sidebar_items = [
-    ['text' => 'Trang Điểm', 'link' => '#trangdiem'],
-    ['text' => 'Mascara', 'link' => '#mascara'],
-    ['text' => 'Son Môi', 'link' => '#sonmoi'],
-    ['text' => 'Chăm Sóc Da', 'link' => '#chamsocda'],
-    ['text' => 'Chăm Sóc Cơ Thể', 'link' => '#chamsocco the'],
-    ['text' => 'Chăm Sóc Tóc', 'link' => '#chamsoc toc'],
-    ['text' => 'Dụng Cụ', 'link' => '#dungcu'],
-    ['text' => 'Nước Hoa', 'link' => '#nuochoa'],
-    ['text' => 'Mỹ Phẩm High-End', 'link' => '#highend'],
-    ['text' => 'Thực Phẩm Chức Năng', 'link' => '#tpcn'],
-];
+require_once 'config/connect.php';
+
+// 1. Lấy toàn bộ danh mục
+$stmt = $pdo->prepare("SELECT * FROM categories ORDER BY parent_id ASC, sort_order ASC, id ASC");
+$stmt->execute();
+$cats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// 2. Phân nhóm theo parent_id để dễ lấy
+// Mảng này sẽ có dạng: [ 0 => [Ds C1], 1 => [Ds con của ID 1], ... ]
+$cats_by_parent = [];
+foreach ($cats as $c) {
+    $cats_by_parent[$c['parent_id']][] = $c;
+}
 ?>
 
+<link rel="stylesheet" href="./css/banner.css">
 <div class="container">
     <div class="row">
 
         <div class="col-lg-3 col-md-4 d-none d-md-block">
-            <div class="sidebar-menu card border-0 rounded-0">
+            <div class="sidebar-menu card border-0 rounded-0 shadow-sm position-relative">
                 <ul class="list-group list-group-flush">
 
-                    <?php foreach ($sidebar_items as $item): ?>
-                        <li
-                            class="list-group-item d-flex justify-content-between align-items-center <?php echo $item['class'] ?? ''; ?>">
-                            <a href="<?php echo $item['link']; ?>" class="text-decoration-none text-dark sidebar-link">
-                                <?php echo $item['text']; ?>
-                            </a>
-                            <i class="bi bi-chevron-right small text-muted"></i>
-                        </li>
-                    <?php endforeach; ?>
+                    <?php
+                    // Lấy danh sách C1 (parent_id = 0)
+                    if (isset($cats_by_parent[0])):
+                        foreach ($cats_by_parent[0] as $c1):
+                            // Kiểm tra xem C1 này có con (C2) không
+                            $has_c2 = isset($cats_by_parent[$c1['id']]);
+                            ?>
+                            <li class="list-group-item menu-item-c1">
+                                <a href="list_products.php?cat_id=<?= $c1['id'] ?>"
+                                    class="d-flex justify-content-between align-items-center text-decoration-none text-dark w-100">
+                                    <span>
+                                        <?= htmlspecialchars($c1['name']) ?>
+                                    </span>
+                                    <?php if ($has_c2): ?>
+                                        <i class="bi bi-chevron-right small text-muted"></i>
+                                    <?php endif; ?>
+                                </a>
+
+                                <?php if ($has_c2): ?>
+                                    <div class="mega-menu shadow-sm">
+                                        <div class="row g-3">
+                                            <?php foreach ($cats_by_parent[$c1['id']] as $c2): ?>
+                                                <div class="col-6 mb-3"> <a href="list_products.php?cat_id=<?= $c2['id'] ?>"
+                                                        class="fw-bold text-dark text-decoration-none d-block mb-1">
+                                                        <?= htmlspecialchars($c2['name']) ?>
+                                                    </a>
+
+                                                    <?php if (isset($cats_by_parent[$c2['id']])): ?>
+                                                        <ul class="list-unstyled ps-2 mb-0 border-start border-2 ms-1">
+                                                            <?php foreach ($cats_by_parent[$c2['id']] as $c3): ?>
+                                                                <li>
+                                                                    <a href="list_products.php?cat_id=<?= $c3['id'] ?>"
+                                                                        class="text-secondary text-decoration-none text-sm d-block py-1 hover-red">
+                                                                        <?= htmlspecialchars($c3['name']) ?>
+                                                                    </a>
+                                                                </li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </li>
+                            <?php
+                        endforeach;
+                    endif;
+                    ?>
 
                 </ul>
             </div>

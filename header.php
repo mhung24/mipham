@@ -2,6 +2,10 @@
 $base_url = "/";
 $contact_phone = "1900-1234";
 $logo_url = "./img/logo-full-black-cocolux.png";
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 
 <!DOCTYPE html>
@@ -40,10 +44,15 @@ $logo_url = "./img/logo-full-black-cocolux.png";
                     </div>
 
                     <div class="col-lg-6 col-md-8 mb-3 mb-lg-0">
-                        <div class="input-group search-group">
-                            <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm...">
-                            <button class="btn" type="button"><i class="bi bi-search"></i></button>
-                        </div>
+                        <form action="list_products.php" method="GET">
+                            <div class="input-group search-group">
+                                <input type="text" name="q" class="form-control" placeholder="Tìm kiếm sản phẩm...">
+
+                                <button class="btn-search-custom" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
                     <div class="col-lg-3 d-none d-lg-block">
@@ -65,14 +74,51 @@ $logo_url = "./img/logo-full-black-cocolux.png";
                                 </div>
                             </div>
 
-                            <a href="login.php"
-                                class="text-decoration-none d-flex align-items-center text-dark ps-3 border-start">
-                                <i class="bi bi-person-circle fs-3 text-secondary me-2"></i>
-                                <div style="line-height: 1.2;">
-                                    <div style="font-size:11px; color:#888;">Tài khoản</div>
-                                    <div style="font-size:13px; font-weight:bold;">Đăng nhập</div>
+                            <?php
+                            if (isset($_SESSION['user_name'])):
+                                ?>
+                                <div class="dropdown ps-3 border-start">
+                                    <a href="#"
+                                        class="text-decoration-none d-flex align-items-center text-dark dropdown-toggle"
+                                        id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                        <i class="bi bi-person-check-fill fs-3 text-success me-2"></i>
+
+                                        <div style="line-height: 1.2;">
+                                            <div style="font-size:11px; color:#888;">Xin chào,</div>
+                                            <div
+                                                style="font-size:13px; font-weight:bold; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <?= htmlspecialchars($_SESSION['user_name']) ?>
+                                            </div>
+                                        </div>
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown"
+                                        style="z-index: 99999;">
+                                        <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i>Tài
+                                                khoản của tôi</a></li>
+                                        <li><a class="dropdown-item" href="orders.php"><i class="bi bi-bag me-2"></i>Đơn
+                                                hàng của tôi</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item text-danger" href="logout.php"><i
+                                                    class="bi bi-box-arrow-right me-2"></i>Đăng xuất</a></li>
+                                    </ul>
                                 </div>
-                            </a>
+
+                            <?php else: ?>
+
+                                <a href="login.php"
+                                    class="text-decoration-none d-flex align-items-center text-dark ps-3 border-start">
+                                    <i class="bi bi-person-circle fs-3 text-secondary me-2"></i>
+                                    <div style="line-height: 1.2;">
+                                        <div style="font-size:11px; color:#888;">Tài khoản</div>
+                                        <div style="font-size:13px; font-weight:bold;">Đăng nhập</div>
+                                    </div>
+                                </a>
+
+                            <?php endif; ?>
 
                         </div>
                     </div>

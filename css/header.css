@@ -216,3 +216,31 @@ body {
 }
 
 /* Menu */
+/* Style cho ô tìm kiếm */
+.search-group {
+  border: 1px solid #e1e1e1;
+  border-radius: 4px; /* Bo góc cả cụm */
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.search-group .form-control {
+  border: none;
+  box-shadow: none; /* Bỏ shadow xanh mặc định của Bootstrap */
+  padding-left: 15px;
+}
+
+/* Style cho nút tìm kiếm mới */
+.btn-search-custom {
+  background-color: #fff; /* Nền trắng */
+  border: none;
+  color: #333; /* Màu icon */
+  padding: 0 15px;
+  transition: all 0.3s;
+  border-left: 1px solid #eee; /* Vạch ngăn cách nhẹ giữa ô nhập và nút */
+}
+
+.btn-search-custom:hover {
+  background-color: #f8f8f8;
+  color: #d0021b; /* Hover vào icon chuyển màu đỏ */
+}

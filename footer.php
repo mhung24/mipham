@@ -102,3 +102,110 @@
         </div>
     </div>
 </footer>
+<script>
+    const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+
+    // --- 1. HÀM LOAD MINI CART (MỚI) ---
+    function renderMiniCart() {
+        if (!isLoggedIn) return;
+
+        fetch('api_get_cart.php')
+            .then(response => response.text())
+            .then(html => {
+                const miniCart = document.getElementById('mini-cart-content');
+                if (miniCart) {
+                    miniCart.innerHTML = html;
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderMiniCart();
+    });
+
+    function addToCart(element) {
+        if (!isLoggedIn) {
+            if (confirm('Bạn cần đăng nhập để mua hàng. Đăng nhập ngay?')) {
+                window.location.href = 'login.php';
+            }
+            return;
+        }
+
+        let productId = element.getAttribute('data-id');
+        let productName = element.getAttribute('data-name') || 'Sản phẩm';
+        let qtyInput = document.getElementById('qty');
+        let quantity = qtyInput ? qtyInput.value : 1;
+
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('quantity', quantity);
+
+        let originalText = element.innerHTML;
+        element.innerHTML = '...';
+        element.disabled = true;
+
+        fetch('api_add_cart.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Trả lại trạng thái nút bấm
+                element.innerHTML = originalText;
+                element.disabled = false;
+
+                if (data.status === 'success') {
+                    // 1. Cập nhật số trên icon Header (Giao diện)
+                    const cartBadge = document.querySelector('#cart-badge');
+                    if (cartBadge) {
+                        cartBadge.innerText = data.total_count;
+
+                        localStorage.setItem('cart_count', data.total_count);
+
+                        cartBadge.classList.add('animate-bounce');
+                        setTimeout(() => cartBadge.classList.remove('animate-bounce'), 500);
+                    }
+
+                    if (typeof renderMiniCart === 'function') renderMiniCart();
+
+                    if (typeof showToast === 'function') {
+                        showToast(`Đã thêm <b>${productName}</b> vào giỏ!`, 'success');
+                    } else {
+                        alert("Đã thêm vào giỏ hàng!");
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedCount = localStorage.getItem('cart_count');
+        const cartBadge = document.querySelector('#cart-badge');
+
+        if (savedCount && cartBadge) {
+            if (cartBadge.innerText == '0' || cartBadge.innerText == '') {
+                cartBadge.innerText = savedCount;
+            }
+        }
+    });
+</script>
+
+<style>
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        50% {
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+    }
+
+    .animate-bounce {
+        animation: bounce 0.5s ease;
+    }
+</style>

@@ -1,6 +1,6 @@
 <?php
 // --- 1. LẤY BANNER TỪ BẢNG 'banners' (ID = 4) ---
-$stmt_banner = $pdo->prepare("SELECT name, image FROM banners WHERE id = 1 LIMIT 1");
+$stmt_banner = $pdo->prepare("SELECT name, image FROM banners WHERE id = 3 LIMIT 1");
 $stmt_banner->execute();
 $banner_data = $stmt_banner->fetch(PDO::FETCH_ASSOC);
 

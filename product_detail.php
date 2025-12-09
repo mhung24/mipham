@@ -125,10 +125,14 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
                 </div>
 
                 <div class="btn-buy-group">
-                    <button class="btn-add-cart" onclick="addToCart(this)" data-id="<?= $product['id'] ?>"
-                        data-name="<?= htmlspecialchars($product['name']) ?>" data-price="<?= $product['price'] ?>"
-                        data-img="<?= htmlspecialchars($gallery[0]) ?>">
-                        <i class="bi bi-bag-plus"></i> THÊM VÀO GIỎ
+                    <?php
+                    $thumb = !empty($gallery) && isset($gallery[0]) ? $gallery[0] : 'https://via.placeholder.com/300';
+                    ?>
+
+                    <button type="button" class="btn btn-danger btn-add-cart w-100 fw-bold py-3"
+                        onclick="addToCart(this, event)" data-id="<?= $product['id'] ?>"
+                        data-name="<?= htmlspecialchars($product['name']) ?>">
+                        <i class="bi bi-bag-plus me-1"></i> THÊM VÀO GIỎ
                     </button>
                     <button class="btn-buy-now">MUA NGAY</button>
                 </div>
@@ -249,65 +253,20 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
 
         </div>
     </div>
+    </div> <?php include 'footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-
-        window.addToCart = function (btn) {
-            let quantityInput = parseInt(document.getElementById("qty").value);
-            if (isNaN(quantityInput) || quantityInput < 1) quantityInput = 1;
-
-            const product = {
-                id: btn.dataset.id,
-                name: btn.dataset.name,
-                price: parseInt(btn.dataset.price),
-                image: btn.dataset.img,
-                qty: quantityInput,
-            };
-
-            let cart = localStorage.getItem("my_cart");
-            try {
-                cart = cart ? JSON.parse(cart) : [];
-            } catch (e) {
-                cart = [];
-            }
-
-            let existingItem = cart.find((item) => item.id === product.id);
-
-            if (existingItem) {
-                existingItem.qty += product.qty;
-            } else {
-                cart.push(product);
-            }
-
-            localStorage.setItem("my_cart", JSON.stringify(cart));
-
-            if (typeof renderMiniCart === "function") {
-                renderMiniCart();
-            }
-
-            showToast(`Đã thêm <b>${product.name}</b> vào giỏ!`, 'success');
-        };
-        function updateQty(change) {
-            const input = document.getElementById("qty");
-
-            let currentVal = parseInt(input.value) || 1;
-            let newVal = currentVal + change;
-
-            if (newVal < 1) newVal = 1;
-            input.value = newVal;
-        }
-
+        // 1. Hàm đổi ảnh khi click vào ảnh nhỏ
         function changeImage(element, src) {
             const mainImage = document.getElementById("mainImage");
             if (mainImage) mainImage.src = src;
 
-            document
-                .querySelectorAll(".thumb-item")
-                .forEach((el) => el.classList.remove("active"));
+            document.querySelectorAll(".thumb-item").forEach((el) => el.classList.remove("active"));
             element.classList.add("active");
         }
 
+        // 2. Hàm copy mã voucher
         function copyCode(btn, code) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(code).then(() => {
@@ -331,7 +290,6 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
             let current = "";
             sections.forEach((section) => {
                 const sectionTop = section.offsetTop;
-
                 if (scrollY >= sectionTop - 180) {
                     current = section.getAttribute("id");
                 }
@@ -339,14 +297,27 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
 
             navLinks.forEach((link) => {
                 link.classList.remove("active");
-
                 if (current && link.getAttribute("href").includes(current)) {
                     link.classList.add("active");
                 }
             });
         });
 
+        function updateQty(change) {
+            const input = document.getElementById("qty");
+            if (input) {
+                let currentVal = parseInt(input.value) || 1;
+                let newVal = currentVal + change;
+                if (newVal < 1) newVal = 1;
+                input.value = newVal;
+            }
+        }
+
+
     </script>
+
 </body>
+
+
 
 </html>

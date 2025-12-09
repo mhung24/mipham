@@ -1,0 +1,112 @@
+/* css/login.css */
+body {
+  background-color: #f8f9fa;
+}
+
+.login-container {
+  max-width: 500px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.login-title {
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #555;
+}
+
+.form-control {
+  height: 45px;
+  font-size: 14px;
+}
+
+.form-control:focus {
+  border-color: #d0021b;
+  box-shadow: 0 0 0 0.2rem rgba(208, 2, 27, 0.25);
+}
+
+.btn-login {
+  background-color: #d0021b;
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  width: 100%;
+  height: 45px;
+  border: none;
+  transition: 0.3s;
+  border-radius: 4px;
+}
+.btn-login:hover {
+  background-color: #a80014;
+  color: #fff;
+}
+
+.login-divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.login-divider span {
+  background: #fff;
+  padding: 0 10px;
+  position: relative;
+  z-index: 1;
+  color: #999;
+  font-size: 13px;
+}
+
+.login-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #eee;
+  z-index: 0;
+}
+
+.social-login a {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-facebook {
+  background: #3b5998;
+  color: #fff;
+}
+
+.btn-google {
+  background: #db4437;
+  color: #fff;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+.register-link a {
+  color: #d0021b;
+  font-weight: 600;
+  text-decoration: none;
+}
