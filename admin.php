@@ -1,5 +1,5 @@
 <?php
-// Tên file: admin.php (Dashboard)
+require_once 'admin_guard.php';
 $active_page = 'dashboard';
 require_once 'config/connect.php';
 

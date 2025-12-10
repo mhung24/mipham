@@ -1,5 +1,5 @@
 <?php
-// Tên file: orders_admin.php
+require_once 'admin_guard.php';
 $active_page = 'orders';
 require_once 'config/connect.php';
 

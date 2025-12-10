@@ -1,4 +1,5 @@
 <?php
+require_once 'admin_guard.php';
 $active_page = 'products';
 require_once 'config/connect.php';
 

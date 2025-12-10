@@ -1,4 +1,5 @@
 <?php
+require_once 'admin_guard.php';
 // Tên file: edit_product_admin.php
 $active_page = 'products';
 require_once 'config/connect.php';

@@ -253,7 +253,9 @@ try {
                                     class="fw-bold fs-4 text-danger"><?= number_format($total_money, 0, ',', '.') ?>đ</span>
                             </div>
 
-                            <a href="checkout.php" class="btn btn-checkout">TIẾN HÀNH THANH TOÁN</a>
+                            <a href="checkout.php" class="btn btn-checkout"
+                                style="background-color: #d0021b; color: #fff;">TIẾN HÀNH
+                                THANH TOÁN</a>
 
                             <div class="mt-3 text-center">
                                 <a href="index.php" class="text-decoration-none text-danger fw-bold"

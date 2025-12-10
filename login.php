@@ -99,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <a href="#" class="text-decoration-none" style="font-size: 13px; color: #666;">Quên mật khẩu?</a>
                 </div>
 
-                <button type="submit" class="btn btn-login">ĐĂNG NHẬP</button>
+                <button style="background-color: #d0021b; color: #fff" type="submit" class="btn btn-login">ĐĂNG
+                    NHẬP</button>
             </form>
 
             <div class="login-divider">

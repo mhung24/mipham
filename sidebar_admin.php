@@ -23,6 +23,11 @@ if (!isset($active_page)) {
                 <i class="fas fa-shopping-cart"></i> Đơn hàng
             </a>
         </li>
+        <li>
+            <a href="reviews_admin.php" class="<?php echo ($active_page == 'customers') ? 'active' : ''; ?>">
+                <i class="fas fa-users"></i> Đánh giá
+            </a>
+        </li>
 
         <li>
             <a href="customers_admin.php" class="<?php echo ($active_page == 'customers') ? 'active' : ''; ?>">
@@ -34,6 +39,6 @@ if (!isset($active_page)) {
                 <i class="fas fa-cog"></i> Cài đặt
             </a>
         </li>
-        <li><a href="#" class="text-danger"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+        <li><a href="logout_admin.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
     </ul>
 </nav>

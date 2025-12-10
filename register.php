@@ -114,7 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             required>
                     </div>
 
-                    <button type="submit" class="btn btn-login">ĐĂNG KÝ</button>
+                    <button style="background-color: #d2100b; color: #fff" type="submit" class="btn btn-login">ĐĂNG
+                        KÝ</button>
                 </form>
 
                 <div class="login-divider">
