@@ -73,6 +73,11 @@ if (!empty($product['category_id'])) {
     }
     $breadcrumbs = array_reverse($breadcrumbs);
 }
+$stmt_reviews = $pdo->prepare("SELECT * FROM product_reviews WHERE product_id = ? AND status = 'approved' ORDER BY comment_date DESC");
+$stmt_reviews->execute([$product_id]);
+$reviews = $stmt_reviews->fetchAll(PDO::FETCH_ASSOC);
+
+$count_reviews = count($reviews);
 ?>
 
 <!DOCTYPE html>
@@ -266,27 +271,103 @@ if (!empty($product['category_id'])) {
                 <?php endforeach; ?>
             </div>
 
-            <div id="feedback" class="scroll-target">
-                <h3 class="section-heading">Đánh giá từ khách hàng</h3>
-                <div class="feedback-container">
-                    <?php foreach ($blocks_feedback as $block): ?>
-                        <div class="review-card">
-                            <div class="review-header">
-                                <div class="review-avatar">K</div>
-                                <div>
-                                    <div style="font-weight:bold; font-size:14px;">Khách hàng</div>
-                                    <div class="review-star">★★★★★</div>
+            <div id="feedback" class="scroll-target mt-4">
+                <h3 class="section-heading border-bottom pb-2">Đánh giá & Nhận xét (<?= $count_reviews ?>)</h3>
+
+                <div class="card mb-4 border-0 bg-light">
+                    <div class="card-body">
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <h6 class="fw-bold">Gửi đánh giá của bạn</h6>
+                            <form action="submit_review.php" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="rate">
+                                        <input type="radio" id="star5" name="rating" value="5" checked />
+                                        <label for="star5" title="5 sao">5 stars</label>
+                                        <input type="radio" id="star4" name="rating" value="4" />
+                                        <label for="star4" title="4 sao">4 stars</label>
+                                        <input type="radio" id="star3" name="rating" value="3" />
+                                        <label for="star3" title="3 sao">3 stars</label>
+                                        <input type="radio" id="star2" name="rating" value="2" />
+                                        <label for="star2" title="2 sao">2 stars</label>
+                                        <input type="radio" id="star1" name="rating" value="1" />
+                                        <label for="star1" title="1 sao">1 star</label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <textarea class="form-control" name="comment" rows="3"
+                                        placeholder="Sản phẩm thế nào? Hãy chia sẻ cảm nhận của bạn..." required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Thêm ảnh thực tế (nếu có):</label>
+                                    <input type="file" class="form-control form-control-sm" name="review_image"
+                                        accept="image/*">
+                                </div>
+
+                                <button type="submit" class="btn btn-danger btn-sm px-4">Gửi Đánh Giá</button>
+                            </form>
+                        <?php else: ?>
+                            <div class="text-center py-3">
+                                <p class="mb-2 text-muted">Bạn cần đăng nhập để gửi đánh giá và hình ảnh.</p>
+                                <a href="login.php" class="btn btn-outline-danger btn-sm">Đăng nhập ngay</a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-list-container">
+                    <?php if (isset($count_reviews) && $count_reviews > 0): ?>
+                        <?php foreach ($reviews as $rv): ?>
+                            <div class="review-item d-flex mb-3 border-bottom pb-3">
+
+                                <div class="review-avatar me-3"
+                                    style="width: 50px; height: 50px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555;">
+                                    <?= strtoupper(substr($rv['user_name'], 0, 1)) ?>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <strong class="text-dark"><?= htmlspecialchars($rv['user_name']) ?></strong>
+                                        <small class="text-muted" style="font-size: 12px;">
+                                            <?= date('d/m/Y H:i', strtotime($rv['comment_date'])) ?>
+                                        </small>
+                                    </div>
+
+                                    <div class="star-display mb-1 text-warning">
+                                        <?php for ($i = 1; $i <= 5; $i++):
+                                            echo ($i <= $rv['rating']) ? '★' : '☆';
+                                        endfor; ?>
+                                    </div>
+
+                                    <p class="mb-2 text-secondary" style="font-size: 14px;">
+                                        <?= nl2br(htmlspecialchars($rv['comment'])) ?>
+                                    </p>
+
+                                    <?php if (!empty($rv['image'])): ?>
+                                        <div class="mt-2">
+                                            <a href="<?= htmlspecialchars($rv['image']) ?>" target="_blank">
+                                                <img src="<?= htmlspecialchars($rv['image']) ?>"
+                                                    class="review-img-preview border rounded"
+                                                    style="max-width: 100px; max-height: 100px; object-fit: cover;"
+                                                    alt="Review Image">
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (isset($rv['is_admin_seed']) && $rv['is_admin_seed']): ?>
+                                        <div class="badge bg-success bg-opacity-10 text-success mt-1">
+                                            <i class="fa fa-check-circle"></i> Đã mua hàng
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-                            <div style="font-size:14px; color:#555; margin-bottom:10px;">
-                                "<?= nl2br(htmlspecialchars($block['content_text'])) ?>"
-                            </div>
-                            <?php if ($block['image_url']): ?>
-                                <img style="width: 500px;" src="<?= htmlspecialchars($block['image_url']) ?>"
-                                    class="review-img">
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted text-center py-4">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -350,6 +431,15 @@ if (!empty($product['category_id'])) {
                 if (newVal < 1) newVal = 1;
                 input.value = newVal;
             }
+        }
+
+        function reloadReviewList() {
+            fetch('get_reviews.php?product_id=123')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('review-list-container').innerHTML = html;
+                })
+                .catch(err => console.error('Lỗi tải đánh giá:', err));
         }
 
 

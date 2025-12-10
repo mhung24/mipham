@@ -151,10 +151,9 @@ const handleEnter = (e, inp, type) => {
           inp.style.display = "none";
           inp.disabled = false;
           inp.placeholder = "Nhập tên & Enter...";
-
-          alert("Đã thêm thành công: " + d.name);
+          showToast(`Đã thêm thành công  ${d.name}`, "success");
         } else {
-          alert(" Lỗi: " + d.message);
+          console.log(" Lỗi: " + d.message);
           inp.disabled = false;
           inp.placeholder = "Nhập tên & Enter...";
           inp.focus();
@@ -162,7 +161,7 @@ const handleEnter = (e, inp, type) => {
       })
       .catch((err) => {
         console.error(err);
-        alert(" Lỗi kết nối server!");
+        console.error(" Lỗi kết nối server!");
         inp.disabled = false;
       });
   }
@@ -197,15 +196,16 @@ const saveQuickData = (type, name, inputElement) => {
         );
 
         revertToSelect(inputElement, selectElement);
-        alert(" Đã tạo thành công: " + data.name);
+        showToast(`Đã thêm thành công sản phẩm ${data.name}`, "success");
       } else {
-        alert("Lỗi: " + data.message);
+        console.log("Lỗi: " + data.message);
+
         revertToSelect(inputElement, null); // Reset nếu lỗi
       }
     })
     .catch((error) => {
       console.error("Error:", error);
-      alert("Có lỗi xảy ra khi kết nối server");
+      console.error("Có lỗi xảy ra khi kết nối server");
       revertToSelect(inputElement, null);
     });
 };

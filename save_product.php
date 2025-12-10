@@ -138,11 +138,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo->commit();
 
-        echo "<script>alert('✅ Thêm sản phẩm thành công!'); window.location.href = 'test_new.php';</script>";
+        header("Location: admin.php?add=success&name=" . urlencode($product_name));
+        exit;
 
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo "<script>alert('❌ Lỗi: " . $e->getMessage() . "'); history.back();</script>";
+
+        header("Location: admin.php?add=error&msg=" . urlencode($e->getMessage()));
     }
+
 }
 ?>
