@@ -9,7 +9,7 @@ if (!isset($active_page)) {
     <div class="logo"><i class="fas fa-user-shield me-2"></i> Admin Panel</div>
     <ul>
         <li>
-            <a href="dashboard_admin.php" class="<?php echo ($active_page == 'dashboard') ? 'active' : ''; ?>">
+            <a href="admin.php" class="<?php echo ($active_page == 'dashboard') ? 'active' : ''; ?>">
                 <i class="fas fa-home"></i> Trang chủ
             </a>
         </li>

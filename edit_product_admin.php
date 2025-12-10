@@ -1,15 +1,10 @@
 <?php
-// Tên file: edit_product_admin.php
 $active_page = 'products';
 require_once 'config/connect.php';
 
 if (!isset($pdo)) {
     die("Lỗi: Không tìm thấy biến kết nối \$pdo.");
 }
-
-// =======================================================================
-// KHỞI TẠO VÀ TẢI DỮ LIỆU CŨ TỪ DATABASE
-// =======================================================================
 
 $product_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$product_id) {
@@ -26,35 +21,29 @@ $specs = [];
 $content_blocks = [];
 
 try {
-    // 1. Dữ liệu Products chính
     $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
     $stmt->execute([$product_id]);
     $product = $stmt->fetch();
     if (!$product)
         throw new Exception("Sản phẩm không tồn tại.");
 
-    // 2. Gallery
     $stmt = $pdo->prepare("SELECT id, image_url FROM product_gallery WHERE product_id = ? ORDER BY id ASC");
     $stmt->execute([$product_id]);
     $gallery = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. Specifications
     $stmt = $pdo->prepare("SELECT id, spec_name, spec_value FROM product_specifications WHERE product_id = ? ORDER BY id ASC");
     $stmt->execute([$product_id]);
     $specs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 4. Content Blocks
     $stmt = $pdo->prepare("SELECT id, section_type, image_url, content_text FROM product_content_blocks WHERE product_id = ? ORDER BY sort_order ASC");
     $stmt->execute([$product_id]);
     $content_blocks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (Exception $e) {
-    // Nếu có lỗi truy vấn ban đầu, chuyển hướng
     header("Location: products_admin.php?action=error&msg=" . urlencode($e->getMessage()));
     exit;
 }
 
-// Hàm đệ quy hiển thị Category (giữ lại từ form bạn gửi)
 if (!function_exists('showCategoryTree')) {
     function showCategoryTree($categories, $selected_id = 0, $parent_id = 0, $level = 0)
     {
@@ -78,7 +67,6 @@ if (!function_exists('showCategoryTree')) {
     }
 }
 
-// Hàm JavaScript để render các khối nội dung đã lưu (được gọi ở cuối file)
 $content_blocks_grouped = [];
 foreach ($content_blocks as $block) {
     $content_blocks_grouped[$block['section_type']][] = $block;
@@ -120,7 +108,7 @@ function renderJsContentBlocks($grouped_blocks)
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin - Chỉnh Sửa Sản Phẩm: <?php echo htmlspecialchars($product['name'] ?? 'ID ' . $product_id); ?></title>
 <link rel="stylesheet" href="./css/admin_new_product.css">
-</head>
+    </head>
 
 <body>
 
@@ -223,10 +211,10 @@ mới...</option>
 </div>
 <div style="margin-top: 25px;">
 <label>📸 Thư viện ảnh sản phẩm (Ảnh bìa & Slide):</label>
-                    <div id="currentGalleryList" class="gallery-preview">
+                    <div id="currentGalleryList" class="gallery-preview" style="display: flex;">
                         <?php foreach ($gallery as $img): ?>
                                 <div class="gallery-item-edit" id="img-<?php echo $img['id']; ?>">
-                                    <img src="<?php echo htmlspecialchars($img['image_url']); ?>" alt="Ảnh Gallery">
+                                    <img width="200px" src="<?php echo htmlspecialchars($img['image_url']); ?>" alt="Ảnh Gallery">
                                     <input type="hidden" name="current_gallery[]" value="<?php echo $img['image_url']; ?>">
                                     <button type="button" class="btn-remove-img" data-img-id="<?php echo $img['id']; ?>" 
                                         onclick="removeImage(this, '<?php echo $img['image_url']; ?>')">✕</button>
@@ -269,11 +257,11 @@ if (!empty($specs)):
                                                     onclick="this.closest('tr').remove()">✕</button></td>
                                         </tr>
                                     <?php $spec_index++; endforeach;
-else: 
+else:
     ?>
                                     <tr>
-                                        <td><input type="text" name="specs[0][name]" value=""></td>
-                                        <td><input type="text" name="specs[0][value]" value=""></td>
+                                        <td><input type="text" name="specs[0][name]" value="Loại da phù hợp"></td>
+                                        <td><input type="text" name="specs[0][value]" value="Mọi loại da"></td>
                                         <td style="text-align:center;"><button type="button" class="btn btn-danger-sm"
                                                 onclick="this.closest('tr').remove()">✕</button></td>
                                     </tr>
@@ -353,6 +341,7 @@ KOLs (Ảnh + Lời bình).</p>
 </div>
 
 <script>
+        // Khởi tạo index cho Specs
         let specIndex = <?php echo $spec_index ?? 1; ?>; 
         
         function addSpecRow() {
@@ -366,6 +355,7 @@ KOLs (Ảnh + Lời bình).</p>
             specIndex++;
         }
         
+        // Khởi tạo index cho Content Blocks
         let contentBlockIndices = {
             'uses_blocks': <?php echo count($content_blocks_grouped['use'] ?? []); ?>,
             'usage_blocks': <?php echo count($content_blocks_grouped['usage'] ?? []); ?>,
@@ -392,11 +382,33 @@ KOLs (Ảnh + Lời bình).</p>
             document.getElementById(containerId).insertAdjacentHTML('beforeend', blockHtml);
         }
 
+        // Hàm để load dữ liệu Content Blocks khi trang tải
         function loadContentBlocks() {
+            // Định nghĩa hàm để add block đã tải (để JS chạy được)
+            if (typeof addLoadedBlock !== 'function') {
+                window.addLoadedBlock = function(namePrefix, containerElement, loadedText, loadedImageUrl, index) {
+                    const imageUrlDisplay = loadedImageUrl ? `<p class="small text-muted">Ảnh hiện tại: <img src="${loadedImageUrl}" style="max-height: 50px;"></p>` : '';
+                    
+                    const blockHtml = `
+                        <div class="card p-3 mb-2 border-primary">
+                            ${imageUrlDisplay}
+                            <textarea class="form-control mb-2" name="${namePrefix}[${index}][text]" placeholder="Nội dung văn bản">${loadedText}</textarea>
+                            <label>Tải ảnh mới (sẽ thay thế):</label>
+                            <input type="file" name="${namePrefix}[${index}][image]" class="form-control form-control-sm">
+                            <input type="hidden" name="${namePrefix}[${index}][current_image]" value="${loadedImageUrl}">
+                            <button type="button" class="btn btn-danger btn-sm mt-2" onclick="this.closest('.card').remove()">Xóa khối</button>
+                        </div>
+                    `;
+                    containerElement.insertAdjacentHTML('beforeend', blockHtml);
+                };
+            }
+            
+            // Chạy logic render PHP
             <?php echo renderJsContentBlocks($content_blocks_grouped); ?>
         }
         window.onload = loadContentBlocks;
         
+        // Hàm xóa ảnh Gallery 
         function removeImage(buttonElement, imageUrl) {
             if (confirm("Xóa ảnh này khỏi Gallery? Ảnh sẽ bị xóa khi bạn bấm CẬP NHẬT.")) {
                 buttonElement.closest('.gallery-item-edit').remove();
@@ -408,11 +420,13 @@ KOLs (Ảnh + Lời bình).</p>
                 document.getElementById('productForm').appendChild(hiddenInput);
             }
         }
- 
+        
+        // Hàm Preview Gallery Files 
         function previewGalleryFiles() {
+            // (Chức năng này cần JS chi tiết hơn để xử lý preview file input multiple)
             console.log("File(s) mới đã được chọn. Sẽ được upload khi bạn CẬP NHẬT.");
         }
-        
+
     </script>
     <script src="./js/new_product.js"></script>
 
