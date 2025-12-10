@@ -55,6 +55,24 @@ $vouchers = $stmt_vouchers->fetchAll(PDO::FETCH_ASSOC);
 $price = $product['price'];
 $old_price = $product['old_price'];
 $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) * 100) : 0;
+$breadcrumbs = [];
+if (!empty($product['category_id'])) {
+    $curr_cat_id = $product['category_id'];
+
+    while ($curr_cat_id) {
+        $stmt_cat = $pdo->prepare("SELECT id, name, parent_id FROM categories WHERE id = ?");
+        $stmt_cat->execute([$curr_cat_id]);
+        $curr_cat = $stmt_cat->fetch(PDO::FETCH_ASSOC);
+
+        if ($curr_cat) {
+            $breadcrumbs[] = $curr_cat;
+            $curr_cat_id = $curr_cat['parent_id'];
+        } else {
+            break;
+        }
+    }
+    $breadcrumbs = array_reverse($breadcrumbs);
+}
 ?>
 
 <!DOCTYPE html>
@@ -75,6 +93,25 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
     <?php include 'menu.php'; ?>
 
     <div class="container container-main">
+        <nav aria-label="breadcrumb" style="margin-bottom: 15px; margin-top: -30px;">
+            <ol class="breadcrumb" style="background: transparent; padding: 0; font-size: 14px;">
+                <li class="breadcrumb-item">
+                    <a href="index.php" style="color: #666; text-decoration: none; font-weight: 600">Trang chủ</a>
+                </li>
+
+                <?php foreach ($breadcrumbs as $cat): ?>
+                    <li class="breadcrumb-item">
+                        <a href="category.php?id=<?= $cat['id'] ?>" style="color: #666; text-decoration: none;">
+                            <?= htmlspecialchars($cat['name']) ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+
+                <li class="breadcrumb-item active" aria-current="page" style="color: #333; font-weight: 500;">
+                    <?= htmlspecialchars($product['name']) ?>
+                </li>
+            </ol>
+        </nav>
 
         <div class="row">
             <div class="col-lg-4 col-md-5">
@@ -198,7 +235,7 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
                     <div class="detail-block">
                         <div class="detail-text"><?= nl2br(htmlspecialchars($block['content_text'])) ?></div>
                         <?php if ($block['image_url']): ?>
-                            <img src="<?= htmlspecialchars($block['image_url']) ?>" alt="Công dụng">
+                            <img style="width: 500px;" src="<?= htmlspecialchars($block['image_url']) ?>" alt="Công dụng">
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
@@ -210,7 +247,7 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
                     <div class="detail-block">
                         <div class="detail-text"><?= nl2br(htmlspecialchars($block['content_text'])) ?></div>
                         <?php if ($block['image_url']): ?>
-                            <img src="<?= htmlspecialchars($block['image_url']) ?>" alt="Cách dùng">
+                            <img style="width: 500px;" src="<?= htmlspecialchars($block['image_url']) ?>" alt="Cách dùng">
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
@@ -221,7 +258,8 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
                 <?php foreach ($blocks_review as $block): ?>
                     <div class="detail-block">
                         <?php if ($block['image_url']): ?>
-                            <img src="<?= htmlspecialchars($block['image_url']) ?>" alt="Marketing Review">
+                            <img style="width: 500px;" src="<?= htmlspecialchars($block['image_url']) ?>"
+                                alt="Marketing Review">
                         <?php endif; ?>
                         <div class="detail-text"><?= nl2br(htmlspecialchars($block['content_text'])) ?></div>
                     </div>
@@ -244,7 +282,8 @@ $discount = ($old_price > $price) ? round((($old_price - $price) / $old_price) *
                                 "<?= nl2br(htmlspecialchars($block['content_text'])) ?>"
                             </div>
                             <?php if ($block['image_url']): ?>
-                                <img src="<?= htmlspecialchars($block['image_url']) ?>" class="review-img">
+                                <img style="width: 500px;" src="<?= htmlspecialchars($block['image_url']) ?>"
+                                    class="review-img">
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>

@@ -22,7 +22,7 @@
   padding: 10px;
   height: 55px;
   width: 216px;
-  background: #171717;
+  background: #222;
   color: #fff;
   text-decoration: none;
 }
@@ -35,7 +35,7 @@
   padding: 10px;
   height: 55px;
   width: 216px;
-  background: #171717;
+  background: #222;
   color: #fff;
   text-decoration: none;
 }
@@ -47,7 +47,7 @@
   right: 0;
   width: calc(100% + 15px);
   border-radius: 0 15px 0 0;
-  background: #171717;
+  background: #222;
   height: 10px;
 }
 .makeup-tab-active-lipstick ::before {
@@ -57,7 +57,7 @@
   right: -15px;
   width: calc(100% + 15px);
   border-radius: 15px 0 0 0;
-  background: #171717;
+  background: #222;
   height: 10px;
 }
 
@@ -68,9 +68,9 @@
   top: 0;
   width: 0;
   height: 0;
-  border-top: 53px solid #171717;
+  border-top: 53px solid  #222;
   border-bottom: 15px solid transparent;
-  border-right: 15px solid #171717;
+  border-right: 15px solid #222;
 }
 
 .makeup-tab-active-lipstick ::after {
@@ -80,9 +80,9 @@
   top: 0;
   width: 0;
   height: 0;
-  border-top: 53px solid #171717;
+  border-top: 53px solid #222;
   border-bottom: 15px solid transparent;
-  border-left: 15px solid #171717;
+  border-left: 15px solid #222;
 }
 
 .makeup-tab-active > h2 {

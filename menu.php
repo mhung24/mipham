@@ -106,7 +106,7 @@ foreach ($all_cats as $cat) {
                 </ul>
             </div>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-3 align-items-center h-100">
                     <?php foreach ($menu_items_db as $item): ?>
                         <li class="nav-item h-100 d-flex align-items-center">
@@ -120,7 +120,7 @@ foreach ($all_cats as $cat) {
                         </li>
                     <?php endforeach; ?>
                 </ul>
-            </div>
+            </div> -->
 
         </nav>
     </div>

@@ -20,19 +20,18 @@
 
             <div class="col-lg-2 col-md-3 col-6 mb-4">
                 <h4>VỀ COCOLUX</h4>
-                <a href="#">Về chúng tôi</a>
-                <a href="#">Câu chuyện thương hiệu</a>
-                <a href="#">Liên hệ</a>
-                <a href="#">Hệ thống cửa hàng</a>
+                <a href="about.php">Về chúng tôi</a>
+                <a href="about.php">Câu chuyện thương hiệu</a>
+                <a href="contact.php">Liên hệ</a>
+                <a href="contact.php">Hệ thống cửa hàng</a>
             </div>
 
             <div class="col-lg-3 col-md-3 col-6 mb-4">
                 <h4>CHÍNH SÁCH</h4>
-                <a href="#">Điều khoản sử dụng</a>
-                <a href="#">Chính sách bảo mật thông tin</a>
-                <a href="#">Chính sách giao hàng</a>
-                <a href="#">Chính sách đổi trả</a>
-                <a href="#">Khách hàng thân thiết</a>
+                <a href="terms_of_use.php">Điều khoản sử dụng</a>
+                <a href="privacy_policy.php">Chính sách bảo mật thông tin</a>
+                <a href="delivery_process.php">Chính sách giao hàng</a>
+                <a href="membership.php">Khách hàng thân thiết</a>
             </div>
 
             <div class="col-lg-3 col-md-12 mb-4">
